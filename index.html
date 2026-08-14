@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aviation Master | Flight Deck</title>
+    <!-- Connects your HTML content directly to your external style.css sheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -61,20 +62,24 @@
 
             <button onclick="performConversion()">Calculate Units</button>
 
-            <div class="calc-result" id="calcResult">Result: 115.08 MPH</div>
+            <div class="calc-result" id="calcResult">Result: 115.078 MPH</div>
         </div>
 
-        <!-- Tool 3: Dynamic Standard Atmosphere Metrics Calculator -->
+        <!-- Tool 3: Live Real-Time Telemetry Feed -->
         <div class="card">
-            <h3>Standard Atmosphere Calculator</h3>
-            <p>Compute theoretical pressure drop (1 inHg per 1,000 ft) and temperature lapse rate (1.98°C per 1,000 ft) from baseline sea level rules.</p>
+            <h3>Live Airport Telemetry (Phase 2)</h3>
+            <p>Fetch authoritative, decoded surface weather metrics live from NOAA servers using a specific 4-letter ICAO airport code identifier.</p>
             
-            <label for="altitudeInput">Target Altitude (Feet)</label>
-            <input type="number" id="altitudeInput" placeholder="Enter altitude, e.g., 5000" value="0" oninput="calculateAtmosphere()">
+            <label for="icaoInput">Airport ICAO Code</label>
+            <input type="text" id="icaoInput" placeholder="e.g. KRDU, KJFK, KLAX" value="KRDU" style="text-transform: uppercase;">
+
+            <button onclick="fetchLiveTelemetry()">Connect Live Feed</button>
 
             <div class="atmosphere-results">
-                <p><strong>Est. Temperature:</strong> <span id="tempResult" class="metric-highlight">15.00 °C</span></p>
-                <p><strong>Est. Barometric Pressure:</strong> <span id="pressResult" class="metric-highlight">29.92 inHg</span></p>
+                <p><strong>Reporting Station:</strong> <span id="stationResult" class="metric-highlight">--</span></p>
+                <p><strong>Observed Temp:</strong> <span id="liveTempResult" class="metric-highlight">-- °C</span></p>
+                <p><strong>Altimeter (Pressure):</strong> <span id="livePressResult" class="metric-highlight">-- inHg</span></p>
+                <p><strong>Wind Vector:</strong> <span id="windResult" class="metric-highlight">--</span></p>
             </div>
         </div>
 
@@ -113,7 +118,7 @@
             document.getElementById('flightHours').value = '';
         }
 
-        // Tool 2 Logic: Unit Conversions
+        // Tool 2 Logic: Unit Conversions (Kept at 3 Decimal Places!)
         function performConversion() {
             const type = document.getElementById('calcType').value;
             const inputVal = parseFloat(document.getElementById('calcInput').value);
@@ -125,34 +130,62 @@
             }
 
             if (type === 'ktToMph') {
-                const mph = (inputVal * 1.15078).toFixed(2);
+                const mph = (inputVal * 1.15078).toFixed(3);
                 resultDiv.innerText = `Result: ${mph} MPH`;
             } else if (type === 'nmToFt') {
-                const feet = (inputVal * 6076.12).toFixed(0);
+                const feet = (inputVal * 6076.115).toFixed(3);
                 resultDiv.innerText = `Result: ${feet} FT`;
             }
         }
 
-        // Tool 3 Logic: Atmosphere Calculator
-        function calculateAtmosphere() {
-            const alt = parseFloat(document.getElementById('altitudeInput').value);
-            const tempDiv = document.getElementById('tempResult');
-            const pressDiv = document.getElementById('pressResult');
+        // Tool 3 Logic: Phase 2 Live NOAA API Telemetry Feed
+        async function fetchLiveTelemetry() {
+            const icao = document.getElementById('icaoInput').value.trim().toUpperCase();
+            const stationDiv = document.getElementById('stationResult');
+            const tempDiv = document.getElementById('liveTempResult');
+            const pressDiv = document.getElementById('livePressResult');
+            const windDiv = document.getElementById('windResult');
 
-            if (isNaN(alt) || alt < 0) {
-                tempDiv.innerText = "-- °C";
-                pressDiv.innerText = "-- inHg";
+            if (icao.length !== 4) {
+                alert('Please enter a valid 4-letter ICAO airport code (e.g., KRDU)!');
                 return;
             }
 
-            const standardTempSeaLevel = 15;
-            const computedTemp = standardTempSeaLevel - ((alt / 1000) * 1.98);
-            
-            const standardPressSeaLevel = 29.92;
-            const computedPress = standardPressSeaLevel - (alt / 1000);
+            stationDiv.innerText = "CONNECTING...";
 
-            tempDiv.innerText = `${computedTemp.toFixed(2)} °C`;
-            pressDiv.innerText = computedPress > 0 ? `${computedPress.toFixed(2)} inHg` : "0.00 inHg (Space)";
+            try {
+                // Queries public aviation data vectors from NOAA's servers in real-time
+                const response = await fetch(`https://aviationweather.gov{icao}&format=json`);
+                
+                if (!response.ok) throw new Error('Network failure');
+                
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    stationDiv.innerText = "NOT FOUND";
+                    alert(`No active telemetry payload found for station: ${icao}`);
+                    return;
+                }
+
+                // Isolate the targeted airport dataset array item
+                const report = data[0];
+
+                // Map live metrics fields straight onto your screen card elements
+                stationDiv.innerText = report.icaoId || icao;
+                tempDiv.innerText = report.temp !== undefined ? `${report.temp.toFixed(1)} °C` : "N/A";
+                pressDiv.innerText = report.altim !== undefined ? `${report.altim.toFixed(2)} inHg` : "N/A";
+                
+                if (!report.wspd || report.wspd === 0) {
+                    windDiv.innerText = "Calm";
+                } else {
+                    windDiv.innerText = `${report.wdir}° @ ${report.wspd} KT`;
+                }
+
+            } catch (error) {
+                console.error('Telemetry stream failed:', error);
+                stationDiv.innerText = "ERROR";
+                alert('Failed to establish a link to the live telemetry database.');
+            }
         }
     </script>
 </body>
