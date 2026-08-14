@@ -34,7 +34,7 @@
             <p>Enter your training flights or simulator time down below to actively append entries onto your current live dashboard session logs.</p>
             
             <label for="logDate">Date of Flight</label>
-            <input type="date" id="logDate" value="2026-08-14">
+            <input type="date" id="logDate">
 
             <label for="flightHours">Duration (Hours / Minutes)</label>
             <input type="text" id="flightHours" placeholder="e.g. 1.5 hours or 1hr 30m">
@@ -91,10 +91,13 @@
             <p>🎨 Adding customizable color theme layouts (Phase 3)</p>
         </div>
 
-    </main> <!-- Grid layout container closed properly before the script engine starts -->
+    </main>
 
     <!-- JavaScript Interactive Logic Engine -->
     <script>
+        // Dynamically initialize the date selector input element to today's local date
+        document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
+
         // Tool 1 Logic: Logbook Entries
         function addLogEntry() {
             const dateInput = document.getElementById('logDate').value;
@@ -170,7 +173,8 @@
             }
 
             try {
-                const url = `https://open-meteo.com{coords.lat}&longitude=${coords.lon}&current=temperature_2m,surface_pressure,wind_speed_10m,wind_direction_10m`;
+                // FIXED: Explicitly corrected template literal variable matching endpoints
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,surface_pressure,wind_speed_10m,wind_direction_10m`;
                 const response = await fetch(url);
                 
                 if (!response.ok) throw new Error('Data pipeline dropped');
