@@ -188,9 +188,6 @@
             }
         }
 
-
-            stationDiv.innerText = "CONNECTING...";
-
             try {
                 // Queries public aviation data vectors from NOAA's servers in real-time
                 const response = await fetch(`https://aviationweather.gov{icao}&format=json`);
