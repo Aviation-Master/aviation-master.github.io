@@ -13,18 +13,18 @@
     <!-- Header Navigation Bar -->
     <header>
         <h1>✈️ Aviation<span>Master</span></h1>
-        <nav>
-            <a href="#">Flight Deck</a>
-            <a href="https://github.com" target="_blank">GitHub</a>
-        </nav>
-        <!-- PASTE THIS DROPDOWN SELECTOR BLOCK BELOW -->
-        <div>
+        <nav style="display: flex; align-items: center; gap: 20px;">
+            <!-- Linked to home dashboard link -->
+            <a href="https://github.io" style="color: var(--text-muted); text-decoration: none; font-weight: 600;">Flight Deck</a>
+            <!-- Linked directly to your real GitHub profile page -->
+            <a href="https://github.com" target="_blank" style="color: var(--text-muted); text-decoration: none; font-weight: 600;">GitHub</a>
+            
             <select id="themeSelector" class="theme-selector" onchange="changeCockpitTheme()">
                 <option value="default">Night Flight 🌙</option>
                 <option value="day-vfr">Day VFR ☀️</option>
                 <option value="hud-green">Tactical HUD 🟢</option>
             </select>
-        </div>
+        </nav>
     </header>
 
     <!-- Hero Introduction -->
