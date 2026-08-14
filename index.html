@@ -4,30 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aviation Master | Flight Deck</title>
+    <!-- Links your content directly to your external style.css stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <!-- Header Navigation Bar -->
     <header>
-        <h1>✈️ Aviation Master</h1>
+        <h1>✈️ Aviation<span>Master</span></h1>
         <nav>
-            <a href="#">Flight Deck</a> | 
+            <a href="#">Flight Deck</a>
             <a href="https://github.com" target="_blank">GitHub</a>
         </nav>
     </header>
 
-    <!-- Main Introduction -->
-    <section>
+    <!-- Hero Introduction -->
+    <section class="hero">
+        <div class="badge">SYSTEMS ONLINE</div>
         <h2>Pre-Flight Dashboard</h2>
-        <p>A central hub featuring flight tracking tools, system metrics data logs, and aviation-themed operational units.</p>
+        <p>A central hub featuring flight tracking tools, system metrics data logs, and aviation-themed operational units. Built completely native with HTML, CSS, and interactive JavaScript.</p>
     </section>
 
-    <!-- Main Grid Layout -->
-    <main>
+    <!-- Dashboard Main Grid Layout -->
+    <main class="container">
 
         <!-- Tool 1: Flight Time Log Tracker -->
-        <div>
+        <div class="card">
             <h3>Logbook Entry Tracker</h3>
             <p>Enter your training flights or simulator time down below to actively append entries onto your current live dashboard session logs.</p>
             
@@ -39,15 +41,13 @@
 
             <button onclick="addLogEntry()">Log Flight Session</button>
 
-            <div id="logOutput">
-                <div>[SYSTEM] Logbook database ready. No entries added yet.</div>
+            <div class="log-output" id="logOutput">
+                <div class="log-item">[SYSTEM] Logbook database ready. No entries added yet.</div>
             </div>
         </div>
 
-        <hr>
-
         <!-- Tool 2: Aviation Unit Calculator Converter -->
-        <div>
+        <div class="card">
             <h3>Quick Aviation Converter</h3>
             <p>Instantly perform standard navigation rule adjustments. Convert airspeed measurements or coordinate distance factors instantly.</p>
             
@@ -58,46 +58,43 @@
             </select>
 
             <label for="calcInput">Value to Convert</label>
-            <input type="number" id="calcInput" value="100">
+            <input type="number" id="calcInput" placeholder="Enter number value here..." value="100">
 
             <button onclick="performConversion()">Calculate Units</button>
 
-            <div id="calcResult">Result: 115.078 MPH</div>
+            <div class="calc-result" id="calcResult">Result: 115.078 MPH</div>
         </div>
 
-        <hr>
-
         <!-- Tool 3: Live Telemetry Feed -->
-        <div>
+        <div class="card">
             <h3>Live Airport Telemetry (Phase 2)</h3>
             <p>Fetch authoritative, decoded surface weather metrics live using a specific 4-letter ICAO airport code identifier.</p>
             
             <label for="icaoInput">Airport ICAO Code</label>
-            <input type="text" id="icaoInput" value="KRDU" style="text-transform: uppercase;">
+            <input type="text" id="icaoInput" placeholder="e.g. KRDU, KJFK, KLAX" value="KRDU" style="text-transform: uppercase;">
 
             <button onclick="fetchLiveTelemetry()">Connect Live Feed</button>
 
-            <div>
-                <p><strong>Reporting Station:</strong> <span id="stationResult">--</span></p>
-                <p><strong>Observed Temp:</strong> <span id="liveTempResult">-- °C</span></p>
-                <p><strong>Altimeter (Pressure):</strong> <span id="livePressResult">-- inHg</span></p>
-                <p><strong>Wind Vector:</strong> <span id="windResult">--</span></p>
+            <div class="atmosphere-results">
+                <p><strong>Reporting Station:</strong> <span id="stationResult" class="metric-highlight">--</span></p>
+                <p><strong>Observed Temp:</strong> <span id="liveTempResult" class="metric-highlight">-- °C</span></p>
+                <p><strong>Altimeter (Pressure):</strong> <span id="livePressResult" class="metric-highlight">-- inHg</span></p>
+                <p><strong>Wind Vector:</strong> <span id="windResult" class="metric-highlight">--</span></p>
             </div>
         </div>
 
-        <hr>
-
         <!-- Section 4: Project Milestones Info -->
-        <div>
+        <div class="card">
             <h3>Upcoming Avionics Upgrades</h3>
+            <p>Future phases of this deployment will see embedded maps and external meteorological tracking frameworks integrated natively.</p>
             <p>🔧 Integrating live API telemetry feeds (Phase 2)</p>
             <p>🎨 Adding customizable color theme layouts (Phase 3)</p>
         </div>
 
-    </main> <!-- The missing layout tag is now completely closed here -->
+    </main>
 
+    <!-- JavaScript Interactive Logic Engine -->
     <script>
-        // Tool 1 Logic: Logbook Entries
         function addLogEntry() {
             const dateInput = document.getElementById('logDate').value;
             const hoursInput = document.getElementById('flightHours').value;
@@ -113,13 +110,13 @@
             }
 
             const entry = document.createElement('div');
+            entry.className = 'log-item';
             entry.innerText = `[LOGGED] ${dateInput} | Duration: ${hoursInput}`;
             
             logOutput.insertBefore(entry, logOutput.firstChild);
             document.getElementById('flightHours').value = '';
         }
 
-        // Tool 2 Logic: Unit Conversions
         function performConversion() {
             const type = document.getElementById('calcType').value;
             const inputVal = parseFloat(document.getElementById('calcInput').value);
@@ -139,7 +136,6 @@
             }
         }
 
-        // Tool 3 Logic: Coordinate Translation Engine
         async function fetchLiveTelemetry() {
             const icao = document.getElementById('icaoInput').value.trim().toUpperCase();
             const stationDiv = document.getElementById('stationResult');
