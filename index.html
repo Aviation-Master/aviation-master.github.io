@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aviation Master | Flight Deck</title>
-    <!-- Connects your HTML content directly to your external style.css sheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -91,6 +90,7 @@
 
     <!-- JavaScript Interactive Logic -->
     <script>
+        // Tool 1 Logic: Logbook entries
         function addLogEntry() {
             const dateInput = document.getElementById('logDate').value;
             const hoursInput = document.getElementById('flightHours').value;
@@ -113,6 +113,7 @@
             document.getElementById('flightHours').value = '';
         }
 
+        // Tool 2 Logic: Unit Conversions
         function performConversion() {
             const type = document.getElementById('calcType').value;
             const inputVal = parseFloat(document.getElementById('calcInput').value);
@@ -132,7 +133,7 @@
             }
         }
 
-        // Standard Atmosphere Calculation Rules
+        // Tool 3 Logic: Atmosphere Calculator
         function calculateAtmosphere() {
             const alt = parseFloat(document.getElementById('altitudeInput').value);
             const tempDiv = document.getElementById('tempResult');
@@ -144,11 +145,9 @@
                 return;
             }
 
-            // Standard Temperature Lapse Rate: Drops 1.98°C per 1,000 feet from 15°C baseline
             const standardTempSeaLevel = 15;
             const computedTemp = standardTempSeaLevel - ((alt / 1000) * 1.98);
             
-            // Standard Pressure Lapse Rate: Drops roughly 1 inHg per 1,000 feet from 29.92 baseline
             const standardPressSeaLevel = 29.92;
             const computedPress = standardPressSeaLevel - (alt / 1000);
 
