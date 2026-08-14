@@ -198,3 +198,19 @@ button:hover {
     margin-top: 10px;
     font-family: monospace;
 }
+/* Custom Atmosphere Interactive Metrics Layout */
+.atmosphere-results p {
+    margin: 12px 0 !important;
+    font-size: 1.05rem !important;
+}
+
+.metric-highlight {
+    color: #10b981;
+    font-family: monospace;
+    font-weight: bold;
+    background-color: var(--midnight-blue);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #2a3c50;
+    margin-left: 5px;
+}
