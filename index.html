@@ -9,14 +9,18 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://w3.org viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
 </head>
 <body>
-
+    
     <!-- Header Navigation Bar -->
     <header>
         <h1>✈️ Aviation<span>Master</span></h1>
-        <nav>
-            <a href="#">Flight Deck</a>
-            <a href="https://github.com/Aviation-Master/aviation-master.github.io" target="_blank">My GitHub Page</a>
-        </nav>
+        <!-- PASTE THIS DROPDOWN SELECTOR BLOCK BELOW -->
+        <div>
+            <select id="themeSelector" class="theme-selector" onchange="changeCockpitTheme()">
+                <option value="default">Night Flight 🌙</option>
+                <option value="day-vfr">Day VFR ☀️</option>
+                <option value="hud-green">Tactical HUD 🟢</option>
+            </select>
+        </div>
     </header>
 
     <!-- Hero Introduction -->
@@ -221,6 +225,17 @@
                 alert('Failed to connect to the live data stream. Verify your connection or retry.');
             }
         }
+        
+        // Phase 3 Theme Logic Matrix Trigger
+        function changeCockpitTheme() {
+            const selectedTheme = document.getElementById('themeSelector').value;
+            if (selectedTheme === 'default') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', selectedTheme);
+            }
+        }
+
     </script>
 </body>
 </html>
