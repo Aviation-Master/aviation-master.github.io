@@ -65,7 +65,7 @@
             <div class="calc-result" id="calcResult">Result: 115.078 MPH</div>
         </div>
 
-        <!-- Tool 3: Live Telemetry Feed (NATIVE NWS OPEN DATA UPGRADE - NO PROXY REQUIRED) -->
+        <!-- Tool 3: Live Telemetry Feed (PASCAL TO INHG MATH FIXED) -->
         <div class="card">
             <h3>Live Airport Telemetry (Phase 2)</h3>
             <p>Fetch authoritative, decoded surface weather metrics live using a specific 4-letter ICAO airport code identifier.</p>
@@ -138,7 +138,7 @@
             }
         }
 
-        // Tool 3 Logic: Native NWS API Feed (Immune to CORS Blocks)
+        // Tool 3 Logic: Corrected NWS Telemetry Engine
         async function fetchLiveTelemetry() {
             const icao = document.getElementById('icaoInput').value.trim().toUpperCase();
             const stationDiv = document.getElementById('stationResult');
@@ -154,47 +154,57 @@
             stationDiv.innerText = "CONNECTING...";
 
             try {
-                // Calls the native, open-access NWS data feed which naturally permits web connections
+                // Calls open-access NWS data node
                 const response = await fetch(`https://weather.gov{icao}/observations/latest`, {
                     headers: { 'User-Agent': 'AviationMasterDashboard/1.0' }
                 });
                 
-                if (!response.ok) throw new Error('Station not found or database offline');
+                if (!response.ok) throw new Error('Station data stream offline');
                 
                 const data = await response.json();
+                
+                if (!data || !data.properties) {
+                    throw new Error('Data payload malformed');
+                }
+                
                 const props = data.properties;
 
-                // Map live metrics fields straight onto your screen card elements
+                // Map reporting identity
                 stationDiv.innerText = icao;
                 
-                // Map Observed Temperature
+                // Unpack Temperature (NWS reports in Celsius natively)
                 if (props.temperature && props.temperature.value !== null) {
                     tempDiv.innerText = `${props.temperature.value.toFixed(1)} °C`;
                 } else {
                     tempDiv.innerText = "N/A";
                 }
                 
-                // Map Altimeter Pressure (Converts Native Pascals to Inches of Mercury)
+                // FIXED DATA CALCULATION: NWS sends barometric values in raw Pascals (Pa). 
+                // Formula multiplying by 0.000295301 safely extracts cockpit Altimeter Inches of Mercury (inHg).
                 if (props.barometricPressure && props.barometricPressure.value !== null) {
-                    const inHg = (props.barometricPressure.value * 0.0002953).toFixed(2);
-                    pressDiv.innerText = `${inHg} inHg`;
+                    const pascals = props.barometricPressure.value;
+                    const computedInHg = (pascals * 0.000295301).toFixed(2);
+                    pressDiv.innerText = `${computedInHg} inHg`;
                 } else {
                     pressDiv.innerText = "N/A";
                 }
                 
-                // Map Wind Speed (Converts Native Meters per Second to Knots) and Direction
-                if (props.windSpeed && props.windSpeed.value !== null && props.windSpeed.value > 0) {
-                    const knots = (props.windSpeed.value * 1.94384).toFixed(0);
-                    const direction = props.windDirection && props.windDirection.value !== null ? `${props.windDirection.value}°` : "VRB";
-                    windDiv.innerText = `${direction} @ ${knots} KT`;
-                } else if (props.windSpeed && props.windSpeed.value === 0) {
-                    windDiv.innerText = "Calm";
+                // Unpack Wind Data Vectors (Converts meters-per-second to knots velocity)
+                if (props.windSpeed && props.windSpeed.value !== null) {
+                    const mps = props.windSpeed.value;
+                    if (mps === 0) {
+                        windDiv.innerText = "Calm";
+                    } else {
+                        const knots = (mps * 1.94384).toFixed(0);
+                        const heading = props.windDirection && props.windDirection.value !== null ? `${props.windDirection.value}°` : "VRB";
+                        windDiv.innerText = `${heading} @ ${knots} KT`;
+                    }
                 } else {
                     windDiv.innerText = "N/A";
                 }
 
             } catch (error) {
-                console.error('Telemetry stream failed:', error);
+                console.error('Telemetry connection failure:', error);
                 stationDiv.innerText = "ERROR";
                 alert('Failed to connect to the live data stream. Verify the ICAO code or retry.');
             }
