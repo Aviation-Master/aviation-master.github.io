@@ -2,10 +2,129 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Youtube Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviation Master | Flight Deck</title>
+    <!-- This line connects your HTML to your CSS file below -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Welcome to My Website!</h1>
-    <p>This is my very first webpage hosted for free on GitHub Pages.</p>
+
+    <!-- Header Navigation -->
+    <header>
+        <h1>✈️ Aviation<span>Master</span></h1>
+        <nav>
+            <a href="#">Flight Deck</a>
+            <a href="https://github.com" target="_blank">GitHub</a>
+        </nav>
+    </header>
+
+    <!-- Hero Introduction -->
+    <section class="hero">
+        <div class="badge">SYSTEMS ONLINE</div>
+        <h2>Pre-Flight Dashboard</h2>
+        <p>A central hub featuring flight tracking tools, system metrics data logs, and aviation-themed operational units. Built completely native with HTML, CSS, and interactive JavaScript.</p>
+    </section>
+
+    <!-- Main Dynamic Interface Layout -->
+    <main class="container">
+
+        <!-- Tool 1: Flight Time Log Tracker -->
+        <div class="card">
+            <h3>Logbook Entry Tracker</h3>
+            <p>Enter your training flights or simulator time down below to actively append entries onto your current live dashboard session logs.</p>
+            
+            <label for="logDate">Date of Flight</label>
+            <input type="date" id="logDate" value="2026-08-14">
+
+            <label for="flightHours">Duration (Hours / Minutes)</label>
+            <input type="text" id="flightHours" placeholder="e.g. 1.5 hours or 1hr 30m">
+
+            <button onclick="addLogEntry()">Log Flight Session</button>
+
+            <div class="log-output" id="logOutput">
+                <div class="log-item">[SYSTEM] Logbook database ready. No entries added yet.</div>
+            </div>
+        </div>
+
+        <!-- Tool 2: Aviation Unit Calculator Converter -->
+        <div class="card">
+            <h3>Quick Aviation Converter</h3>
+            <p>Instantly perform standard navigation rule adjustments. Convert airspeed measurements or coordinate distance factors instantly.</p>
+            
+            <label for="calcType">Conversion Profile</label>
+            <select id="calcType">
+                <option value="ktToMph">Knots (KT) to Miles Per Hour (MPH)</option>
+                <option value="nmToFt">Nautical Miles (NM) to Feet (FT)</option>
+            </select>
+
+            <label for="calcInput">Value to Convert</label>
+            <input type="number" id="calcInput" placeholder="Enter number value here..." value="100">
+
+            <button onclick="performConversion()">Calculate Units</button>
+
+            <div class="calc-result" id="calcResult">Result: 115.08 MPH</div>
+        </div>
+
+        <!-- Section 3: Static Aviation Reference Data -->
+        <div class="card">
+            <h3>Standard Atmosphere Metrics</h3>
+            <p>Core telemetry baseline for general flight calculations. Atmospheric pressures alter altimeter requirements globally.</p>
+            <p><strong>Standard Temperature:</strong> 15°C (59°F)</p>
+            <p><strong>Standard Sea Level Pressure:</strong> 29.92 inches of mercury (inHg) / 1013.2 millibars (mb)</p>
+        </div>
+
+        <!-- Section 4: Project Milestones Info -->
+        <div class="card">
+            <h3>Upcoming Avionics Upgrades</h3>
+            <p>Future phases of this deployment will see embedded maps and external meteorological tracking frameworks integrated natively.</p>
+            <p>🔧 Integrating live API telemetry feeds (Phase 2)</p>
+            <p>🎨 Adding customizable color theme layouts (Phase 3)</p>
+        </div>
+
+    </main>
+
+    <!-- JavaScript Interactive Logic -->
+    <script>
+        function addLogEntry() {
+            const dateInput = document.getElementById('logDate').value;
+            const hoursInput = document.getElementById('flightHours').value;
+            const logOutput = document.getElementById('logOutput');
+
+            if (!hoursInput) {
+                alert('Please enter a duration!');
+                return;
+            }
+
+            if (logOutput.innerText.includes("No entries added yet")) {
+                logOutput.innerHTML = '';
+            }
+
+            const entry = document.createElement('div');
+            entry.className = 'log-item';
+            entry.innerText = `[LOGGED] ${dateInput} | Duration: ${hoursInput}`;
+            
+            logOutput.insertBefore(entry, logOutput.firstChild);
+            document.getElementById('flightHours').value = '';
+        }
+
+        function performConversion() {
+            const type = document.getElementById('calcType').value;
+            const inputVal = parseFloat(document.getElementById('calcInput').value);
+            const resultDiv = document.getElementById('calcResult');
+
+            if (isNaN(inputVal)) {
+                resultDiv.innerText = "Please enter a valid number";
+                return;
+            }
+
+            if (type === 'ktToMph') {
+                const mph = (inputVal * 1.15078).toFixed(2);
+                resultDiv.innerText = `Result: ${mph} MPH`;
+            } else if (type === 'nmToFt') {
+                const feet = (inputVal * 6076.12).toFixed(0);
+                resultDiv.innerText = `Result: ${feet} FT`;
+            }
+        }
+    </script>
 </body>
 </html>
