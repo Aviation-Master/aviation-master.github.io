@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aviation Master | Flight Deck</title>
-    <!-- This line connects your HTML to your CSS file below -->
+    <!-- Connects your HTML content directly to your external style.css sheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -65,12 +65,18 @@
             <div class="calc-result" id="calcResult">Result: 115.08 MPH</div>
         </div>
 
-        <!-- Section 3: Static Aviation Reference Data -->
+        <!-- Tool 3: Dynamic Standard Atmosphere Metrics Calculator -->
         <div class="card">
-            <h3>Standard Atmosphere Metrics</h3>
-            <p>Core telemetry baseline for general flight calculations. Atmospheric pressures alter altimeter requirements globally.</p>
-            <p><strong>Standard Temperature:</strong> 15°C (59°F)</p>
-            <p><strong>Standard Sea Level Pressure:</strong> 29.92 inches of mercury (inHg) / 1013.2 millibars (mb)</p>
+            <h3>Standard Atmosphere Calculator</h3>
+            <p>Compute theoretical pressure drop (1 inHg per 1,000 ft) and temperature lapse rate (1.98°C per 1,000 ft) from baseline sea level rules.</p>
+            
+            <label for="altitudeInput">Target Altitude (Feet)</label>
+            <input type="number" id="altitudeInput" placeholder="Enter altitude, e.g., 5000" value="0" oninput="calculateAtmosphere()">
+
+            <div class="atmosphere-results">
+                <p><strong>Est. Temperature:</strong> <span id="tempResult" class="metric-highlight">15.00 °C</span></p>
+                <p><strong>Est. Barometric Pressure:</strong> <span id="pressResult" class="metric-highlight">29.92 inHg</span></p>
+            </div>
         </div>
 
         <!-- Section 4: Project Milestones Info -->
@@ -124,6 +130,30 @@
                 const feet = (inputVal * 6076.12).toFixed(0);
                 resultDiv.innerText = `Result: ${feet} FT`;
             }
+        }
+
+        // Standard Atmosphere Calculation Rules
+        function calculateAtmosphere() {
+            const alt = parseFloat(document.getElementById('altitudeInput').value);
+            const tempDiv = document.getElementById('tempResult');
+            const pressDiv = document.getElementById('pressResult');
+
+            if (isNaN(alt) || alt < 0) {
+                tempDiv.innerText = "-- °C";
+                pressDiv.innerText = "-- inHg";
+                return;
+            }
+
+            // Standard Temperature Lapse Rate: Drops 1.98°C per 1,000 feet from 15°C baseline
+            const standardTempSeaLevel = 15;
+            const computedTemp = standardTempSeaLevel - ((alt / 1000) * 1.98);
+            
+            // Standard Pressure Lapse Rate: Drops roughly 1 inHg per 1,000 feet from 29.92 baseline
+            const standardPressSeaLevel = 29.92;
+            const computedPress = standardPressSeaLevel - (alt / 1000);
+
+            tempDiv.innerText = `${computedTemp.toFixed(2)} °C`;
+            pressDiv.innerText = computedPress > 0 ? `${computedPress.toFixed(2)} inHg` : "0.00 inHg (Space)";
         }
     </script>
 </body>
