@@ -167,7 +167,8 @@
             }
 
             try {
-                const url = `https://open-meteo.com{coords.lat}&longitude=${coords.lon}&current=temperature_2m,surface_pressure,wind_speed_10m,wind_direction_10m`;
+                // FIXED FORMULA: Forced specific secure data format parameter declarations directly into the request string
+                const url = `https://open-meteo.com{coords.lat}&longitude=${coords.lon}&current=temperature_2m,surface_pressure,wind_speed_10m,wind_direction_10m&format=json`;
                 const response = await fetch(url);
                 
                 if (!response.ok) throw new Error('Data pipeline dropped');
