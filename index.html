@@ -38,7 +38,7 @@
     <!-- Dashboard Main Grid Layout -->
     <main class="container">
 
-        <!-- Tool 1: Flight Time Log Tracker -->
+        <!-- Tool 1: Flight Time Log Tracker (With Permanent Memory & Selective Clear Engine) -->
         <div class="card">
             <h3>Logbook Entry Tracker</h3>
             <p>Enter your training flights or simulator time down below to actively append entries onto your current live dashboard session logs.</p>
@@ -49,10 +49,14 @@
             <label for="flightHours">Duration (Hours / Minutes)</label>
             <input type="text" id="flightHours" placeholder="e.g. 1.5 hours or 1hr 30m">
 
-            <button onclick="addLogEntry()">Log Flight Session</button>
+            <!-- Side-by-side action buttons -->
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button onclick="addLogEntry()" style="flex: 2;">Log Flight Session</button>
+                <button onclick="clearSelectedLogs()" style="flex: 1; background-color: #ef4444; color: white;">Clear Checked</button>
+            </div>
 
             <div class="log-output" id="logOutput">
-                <div class="log-item">[SYSTEM] Logbook database ready. No entries added yet.</div>
+                <div class="log-item" id="defaultLogMessage">[SYSTEM] Logbook database ready. No entries added yet.</div>
             </div>
         </div>
 
@@ -123,7 +127,10 @@
         
         document.getElementById('logDate').value = `${yyyy}-${mm}-${dd}`;
 
-        // Tool 1 Logic: Logbook Entries
+        // Run this immediately on page load to restore saved flights from local browser memory
+        loadSavedLogbook();
+
+        // Tool 1 Logic: Logbook Entries (Generates an active checkbox wrapper for every item)
         function addLogEntry() {
             const dateInput = document.getElementById('logDate').value;
             const hoursInput = document.getElementById('flightHours').value;
@@ -134,16 +141,93 @@
                 return;
             }
 
-            if (logOutput.innerText.includes("No entries added yet")) {
-                logOutput.innerHTML = '';
+            // Remove placeholder message element if it exists
+            const defaultMsg = document.getElementById('defaultLogMessage');
+            if (defaultMsg) {
+                defaultMsg.remove();
             }
 
-            const entry = document.createElement('div');
-            entry.className = 'log-item';
-            entry.innerText = `[LOGGED] ${dateInput} | Duration: ${hoursInput}`;
+            const logText = `[LOGGED] ${dateInput} | Duration: ${hoursInput}`;
+
+            // 1. Create a structured container with an embedded check switch
+            const entryRow = document.createElement('div');
+            entryRow.className = 'log-item';
+            entryRow.style.display = 'flex';
+            entryRow.style.alignItems = 'center';
+            entryRow.style.gap = '10px';
             
-            logOutput.insertBefore(entry, logOutput.firstChild);
+            // Build the checkbox element layout structure
+            entryRow.innerHTML = `
+                <input type="checkbox" class="log-clear-chk" style="width: auto; margin-bottom: 0; cursor: pointer;">
+                <span class="log-text-data">${logText}</span>
+            `;
+            
+            logOutput.insertBefore(entryRow, logOutput.firstChild);
+
+            // 2. Write the entry straight to the browser's disk array data layer (Permanent Storage)
+            let savedLogs = JSON.parse(localStorage.getItem('aviationLogbook')) || [];
+            savedLogs.unshift(logText); // Keep newest items on top
+            localStorage.setItem('aviationLogbook', JSON.stringify(savedLogs));
+
             document.getElementById('flightHours').value = '';
+        }
+
+        // Database Loader: Re-builds checkable elements from your hard drive memory on startup
+        function loadSavedLogbook() {
+            const logOutput = document.getElementById('logOutput');
+            const savedLogs = JSON.parse(localStorage.getItem('aviationLogbook')) || [];
+
+            if (savedLogs.length > 0) {
+                logOutput.innerHTML = ''; // Clear default system block
+                savedLogs.forEach(logText => {
+                    const entryRow = document.createElement('div');
+                    entryRow.className = 'log-item';
+                    entryRow.style.display = 'flex';
+                    entryRow.style.alignItems = 'center';
+                    entryRow.style.gap = '10px';
+                    
+                    entryRow.innerHTML = `
+                        <input type="checkbox" class="log-clear-chk" style="width: auto; margin-bottom: 0; cursor: pointer;">
+                        <span class="log-text-data">${logText}</span>
+                    `;
+                    logOutput.appendChild(entryRow);
+                });
+            }
+        }
+
+        // Selective Deletion Loop Engine: Re-indexes database entries based on check parameters
+        function clearSelectedLogs() {
+            const logOutput = document.getElementById('logOutput');
+            const rows = logOutput.querySelectorAll('.log-item');
+            
+            let updatedLogsArray = [];
+            let checkCount = 0;
+
+            // Loop through your screen elements list to safely verify constraints
+            rows.forEach(row => {
+                const chk = row.querySelector('.log-clear-chk');
+                // If it isn't checked, keep it in our system array memory layer
+                if (chk && !chk.checked) {
+                    const textNode = row.querySelector('.log-text-data');
+                    if (textNode) updatedLogsArray.push(textNode.innerText);
+                } else if (chk && chk.checked) {
+                    checkCount++;
+                    row.remove(); // Safely pull it straight off your browser screen DOM tracking tree
+                }
+            });
+
+            if (checkCount === 0) {
+                alert('Please check the box next to the flight logs you wish to delete first!');
+                return;
+            }
+
+            // Sync the updated collection file array back to your local hard drive cache space
+            localStorage.setItem('aviationLogbook', JSON.stringify(updatedLogsArray));
+
+            // If you delete absolutely every row, automatically restore the original system banner message
+            if (updatedLogsArray.length === 0) {
+                logOutput.innerHTML = '<div class="log-item" id="defaultLogMessage">[SYSTEM] Logbook database ready. No entries added yet.</div>';
+            }
         }
 
         // Tool 2 Logic: Unit Conversions
