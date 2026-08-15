@@ -330,16 +330,30 @@
             }
         }
         
-        // Phase 3 Theme Logic Matrix Trigger
+                // Phase 3 Theme Logic Matrix Trigger (With Persistent Memory Storage)
         function changeCockpitTheme() {
             const selectedTheme = document.getElementById('themeSelector').value;
+            
             if (selectedTheme === 'default') {
                 document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('cockpitThemeSetting', 'default');
             } else {
                 document.documentElement.setAttribute('data-theme', selectedTheme);
+                localStorage.setItem('cockpitThemeSetting', selectedTheme);
             }
         }
 
+        // Run this immediately on page load to restore your favorite saved cockpit style
+        function loadSavedCockpitTheme() {
+            const savedTheme = localStorage.getItem('cockpitThemeSetting');
+            if (savedTheme && savedTheme !== 'default') {
+                document.getElementById('themeSelector').value = savedTheme;
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+        }
+
+        // Initialize the theme state on load trigger
+        loadSavedCockpitTheme();
     </script>
 </body>
 </html>
