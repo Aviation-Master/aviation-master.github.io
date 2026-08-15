@@ -49,10 +49,11 @@
             <label for="flightHours">Duration (Hours / Minutes)</label>
             <input type="text" id="flightHours" placeholder="e.g. 1.5 hours or 1hr 30m" onfocus="this.select()">
 
-            <!-- Side-by-side action buttons -->
+            <!-- Three side-by-side action buttons -->
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <button onclick="addLogEntry()" style="flex: 2;">Log Flight Session</button>
-                <button onclick="clearSelectedLogs()" style="flex: 1; background-color: #ef4444; color: white;">Clear Checked</button>
+                <button onclick="clearSelectedLogs()" style="flex: 1.2; background-color: #ef4444; color: white;">Clear Checked</button>
+                <button onclick="clearAllLogs()" style="flex: 1; background-color: #7f1d1d; color: white;">Clear All</button>
             </div>
 
             <div class="log-output" id="logOutput">
@@ -382,6 +383,20 @@
                 fetchLiveTelemetry(); 
             }
         });
+        // Permanent Wipe Engine: Clears the screen and empties browser disk storage entirely
+        function clearAllLogs() {
+            // Ask for confirmation so you don't accidentally wipe your logs mid-flight
+            if (confirm("Are you sure you want to permanently clear your entire flight logbook history?")) {
+                const logOutput = document.getElementById('logOutput');
+                
+                // 1. Wipe the browser's local hard drive memory key
+                localStorage.removeItem('aviationLogbook');
+                
+                // 2. Restore the original clean system banner message onto the screen
+                logOutput.innerHTML = '<div class="log-item" id="defaultLogMessage">[SYSTEM] Logbook database ready. No entries added yet.</div>';
+            }
+        }
+
     </script> 
 </body> 
 </html>
