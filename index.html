@@ -113,10 +113,15 @@
 
     </main>
 
-    <!-- JavaScript Interactive Logic Engine -->
+        <!-- JavaScript Interactive Logic Engine -->
     <script>
-        // Dynamically initialize the date selector input element to today's local date
-        document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
+        // FIXED LOCAL TIMEZONE ENGINE: Forces the calendar box to lock onto your true local clock
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+        const dd = String(today.getDate()).padStart(2, '0');
+        
+        document.getElementById('logDate').value = `${yyyy}-${mm}-${dd}`;
 
         // Tool 1 Logic: Logbook Entries
         function addLogEntry() {
