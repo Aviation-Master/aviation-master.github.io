@@ -47,7 +47,7 @@
             <input type="date" id="logDate">
 
             <label for="flightHours">Duration (Hours / Minutes)</label>
-            <input type="text" id="flightHours" placeholder="e.g. 1.5 hours or 1hr 30m">
+            <input type="text" id="flightHours" placeholder="e.g. 1.5 hours or 1hr 30m" onfocus="this.select()">
 
             <!-- Side-by-side action buttons -->
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
@@ -72,7 +72,7 @@
             </select>
 
             <label for="calcInput">Value to Convert</label>
-            <input type="number" id="calcInput" placeholder="Enter number value here..." value="100">
+            <input type="number" id="calcInput" placeholder="Enter number value here..." value="100" onfocus="this.select()">
 
             <button onclick="performConversion()">Calculate Units</button>
 
@@ -85,7 +85,7 @@
             <p>Fetch authoritative, decoded surface weather metrics live using a specific 4-letter ICAO airport code identifier.</p>
             
             <label for="icaoInput">Airport ICAO Code</label>
-            <input type="text" id="icaoInput" value="KRDU" style="text-transform: uppercase;">
+            <input type="text" id="icaoInput" value="KRDU" style="text-transform: uppercase;" onfocus="this.select()">
 
             <button onclick="fetchLiveTelemetry()">Connect Live Feed</button>
 
@@ -343,17 +343,45 @@
             }
         }
 
-        // Run this immediately on page load to restore your favorite saved cockpit style
-        function loadSavedCockpitTheme() {
-            const savedTheme = localStorage.getItem('cockpitThemeSetting');
-            if (savedTheme && savedTheme !== 'default') {
-                document.getElementById('themeSelector').value = savedTheme;
-                document.documentElement.setAttribute('data-theme', savedTheme);
-            }
-        }
-
-        // Initialize the theme state on load trigger
+                // Run this immediately on page load to restore your favorite saved cockpit style
+        function loadSavedCockpitTheme() { 
+            const savedTheme = localStorage.getItem('cockpitThemeSetting'); 
+            if (savedTheme && savedTheme !== 'default') { 
+                document.getElementById('themeSelector').value = savedTheme; 
+                document.documentElement.setAttribute('data-theme', savedTheme); 
+            } 
+        } 
+        
+        // Initialize the theme state on load trigger 
         loadSavedCockpitTheme();
-    </script>
-</body>
+
+        // ========================================================
+        // KEYBOARD SHORTCUTS ENGINE INSIDE YOUR FILE
+        // ========================================================
+        
+        // 1. Listen inside the Logbook Duration entry box
+        document.getElementById('flightHours').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); 
+                addLogEntry(); 
+            }
+        });
+
+        // 2. Listen inside the Quick Aviation Unit Converter entry box
+        document.getElementById('calcInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                performConversion(); 
+            }
+        });
+
+        // 3. Listen inside the Live Airport Telemetry ICAO entry box
+        document.getElementById('icaoInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                fetchLiveTelemetry(); 
+            }
+        });
+    </script> 
+</body> 
 </html>
